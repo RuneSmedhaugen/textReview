@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import uploadRouter from './routes/upload.js';
+import analyzeTextRouter from './routes/analyzeText.js';
 
 
 
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/upload', uploadRouter);
+app.use("/analyze-text", analyzeTextRouter);
 
 
 const PORT = process.env.PORT || 5000;
