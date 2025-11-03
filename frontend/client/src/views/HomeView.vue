@@ -21,7 +21,7 @@
                 <textarea class="form-control" v-model="pastedText" rows="8" placeholder="Paste your text here"></textarea>
               </div>
 
-              <!-- 👇 NEW: Document type selector -->
+              
               <div class="mb-3">
                 <label class="form-label">Select document type</label>
                 <select class="form-select" v-model="selectedType">
@@ -44,10 +44,7 @@
               </div>
             </form>
 
-            <div v-if="resultText" class="mt-4">
-              <h5>Extracted Text</h5>
-              <div class="card"><div class="card-body pre-wrap">{{ resultText }}</div></div>
-            </div>
+
 
             <div v-if="summaryText" class="mt-3">
               <h5>Summary</h5>
@@ -68,9 +65,8 @@ import axios from 'axios'
 
 const pastedText = ref('')
 const selectedFile = ref(null)
-const resultText = ref('')
 const summaryText = ref('')
-const selectedType = ref('') // 👈 user-selected document type
+const selectedType = ref('') 
 const loading = ref(false)
 const errorMsg = ref('')
 
@@ -79,57 +75,54 @@ function handleFileUpload(event) {
   selectedFile.value = file || null
   if (file) {
     pastedText.value = ''
-    resultText.value = `Selected file: ${file.name}`
     summaryText.value = ''
   }
 }
 
 async function submitText() {
-  errorMsg.value = ''
-  resultText.value = ''
-  summaryText.value = ''
-  loading.value = true
+  errorMsg.value = '';
+  summaryText.value = '';
+  loading.value = true;
 
   try {
-    let textToAnalyze = ''
+    const validTypes = [
+      "CV", "essay", "report", "article", "business email", "generic text"
+    ];
+    if (!selectedType.value || !validTypes.includes(selectedType.value)) {
+      errorMsg.value = 'Please select a valid document type.';
+      return;
+    }
 
+    let summaryResp;
     if (selectedFile.value) {
-      const form = new FormData()
-      form.append('file', selectedFile.value)
-      const resp = await axios.post('http://localhost:5000/upload', form)
-      textToAnalyze = resp.data?.text || ''
-      resultText.value = textToAnalyze
+      // Send file and type together
+      const form = new FormData();
+      form.append('file', selectedFile.value);
+      form.append('type', selectedType.value);
+      summaryResp = await axios.post('http://localhost:5000/upload-and-summarize', form);
     } else if (pastedText.value.trim()) {
-      textToAnalyze = pastedText.value
-      resultText.value = textToAnalyze
+      // Send pasted text and type together
+      summaryResp = await axios.post('http://localhost:5000/analyze-text', {
+        text: pastedText.value,
+        type: selectedType.value,
+      });
     } else {
-      errorMsg.value = 'Please upload a file or paste some text before submitting.'
-      return
+      errorMsg.value = 'Please upload a file or paste some text before submitting.';
+      return;
     }
 
-    if (!selectedType.value) {
-      errorMsg.value = 'Please select a document type.'
-      return
-    }
-
-    const summaryResp = await axios.post('http://localhost:5000/analyze-text', {
-      text: textToAnalyze,
-      type: selectedType.value,
-    })
-
-    summaryText.value = summaryResp.data?.summary || 'No summary returned.'
+    summaryText.value = summaryResp.data?.summary || 'No summary returned.';
   } catch (err) {
-    console.error(err)
-    errorMsg.value = err.response?.data?.error || err.message || 'Failed to process text.'
+    console.error(err);
+    errorMsg.value = err.response?.data?.error || err.message || 'Failed to process text.';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 function clearAll() {
   pastedText.value = ''
   selectedFile.value = null
-  resultText.value = ''
   summaryText.value = ''
   selectedType.value = ''
   errorMsg.value = ''
@@ -141,20 +134,20 @@ function clearAll() {
 <style scoped>
 .pre-wrap { white-space: pre-wrap; word-break: break-word; }
 .card-header h3 { font-weight: 600; }
-/* 🌙 DARK MODE THEME */
+
 body, .container {
   background-color: #121212;
   color: #e0e0e0;
 }
 
-/* Card styling */
+
 .card {
   background-color: #1e1e1e;
   border: 1px solid #333;
   color: #e0e0e0;
 }
 
-/* Header */
+
 .card-header {
   background-color: #2a2a2a !important;
   border-bottom: 1px solid #333;
@@ -164,7 +157,7 @@ body, .container {
   color: #ffffff;
 }
 
-/* Inputs and textarea */
+
 .form-control {
   background-color: #2b2b2b;
   color: #ffffff;
@@ -178,7 +171,7 @@ body, .container {
   color: #fff;
 }
 
-/* Buttons */
+
 .btn-primary {
   background-color: #007bff;
   border-color: #007bff;
@@ -194,13 +187,13 @@ body, .container {
   border-color: #777;
 }
 
-/* Summary + text boxes */
+
 .card-body.pre-wrap {
   background-color: #252323;
   border-radius: 6px;
 }
 
-/* Alerts */
+
 .alert-danger {
   background-color: #3a0d0d;
   color: #ffb3b3;
