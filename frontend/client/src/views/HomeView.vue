@@ -99,7 +99,7 @@ async function submitText() {
       const form = new FormData();
       form.append('file', selectedFile.value);
       form.append('type', selectedType.value);
-      summaryResp = await axios.post('http://localhost:5000/upload-and-summarize', form);
+      summaryResp = await axios.post('http://localhost:5000/upload/upload-and-summarize', form);
     } else if (pastedText.value.trim()) {
       // Send pasted text and type together
       summaryResp = await axios.post('http://localhost:5000/analyze-text', {
