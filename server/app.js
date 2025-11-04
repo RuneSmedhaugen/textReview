@@ -6,6 +6,7 @@ import analyzeTextRouter from './routes/analyzeText.js';
 
 
 
+
 dotenv.config();
 const app = express();
 app.use(cors());
