@@ -82,7 +82,7 @@ The frontend will run at `http://localhost:5173` (or the port shown in the termi
 - **Backend:** Express, Ollama LLaMA model integration (`server/ai.js`)  
 - **Frontend:** Vue 3, Bootstrap 5  
 - To add new document types or improve feedback prompts, edit `server/ai.js`.
-- For file handling, the backend supports `.pdf`, `.docx`, `.doc`, `.txt` formats.
+- For file handling, the backend supports `.pdf`, `.docx`, `.txt` formats.
 - Frontend uses Axios for API requests and provides a file upload interface and text area input.
 
 ## Contributing
