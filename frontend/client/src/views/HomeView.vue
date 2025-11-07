@@ -17,27 +17,27 @@
             <form @submit.prevent="submitText">
               <!-- Upload File -->
               <div class="mb-3">
-                <label class="form-label">
-                  <i class="bi bi-upload me-1"></i> Upload File
-                </label>
-                <input class="form-control" type="file" @change="handleFileUpload" />
-                <div class="form-text">
-                  <i class="bi bi-file-earmark-text me-1"></i> Supported: .txt, .pdf, .docx, .doc
-                </div>
-              </div>
+             <label class="form-label">Upload file</label>
+              <input 
+                class="form-control"
+                type="file"
+                @change="handleFileUpload"
+                :disabled="pastedText.trim().length > 0" 
+              />
+              <div class="form-text">Supported: .txt, .pdf, .docx, .doc</div>
+            </div>
 
-              <!-- Paste Text -->
-              <div class="mb-3">
-                <label class="form-label">
-                  <i class="bi bi-clipboard-check me-1"></i> Or Paste Text
-                </label>
-                <textarea
-                  class="form-control"
-                  v-model="pastedText"
-                  rows="8"
-                  placeholder="Paste your text here"
-                ></textarea>
-              </div>
+            <div class="mb-3">
+              <label class="form-label">Or paste text</label>
+              <textarea
+                class="form-control"
+                v-model="pastedText"
+                rows="8"
+                placeholder="Paste your text here"
+                :disabled="selectedFile !== null"
+              ></textarea>
+            </div>
+
 
               <!-- Document Type -->
               <div class="mb-3">
@@ -114,14 +114,18 @@ const selectedType = ref("");
 const loading = ref(false);
 const errorMsg = ref("");
 
+// Updated to prevemt conflicts between file upload and pasted text
 function handleFileUpload(event) {
   const file = event.target.files?.[0];
-  selectedFile.value = file || null;
   if (file) {
-    pastedText.value = "";
-    summaryText.value = "";
+    selectedFile.value = file;
+    pastedText.value = '';
+    summaryText.value = '';
+  } else {
+    selectedFile.value = null;
   }
 }
+
 
 async function submitText() {
   errorMsg.value = "";
@@ -168,6 +172,9 @@ function clearAll() {
   errorMsg.value = "";
   document.querySelector("input[type='file']").value = "";
 }
+
+
+
 </script>
 
 <style scoped>
